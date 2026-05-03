@@ -1,5 +1,5 @@
 import { TABS } from "@/constants/data";
-import { Image } from "expo-image";
+import { Image } from "react-native";
 import { Tabs } from "expo-router";
 import { View } from "react-native";
 import { clsx } from "clsx";
@@ -16,8 +16,8 @@ const TabsLayout = () => {
         <View className={clsx("tabs-pill", focused && "tabs-active")}>
           <Image
             source={icon}
+            resizeMode="contain"
             className="tabs-glyph"
-            tintColor={focused ? "#ea7a53" : "black"}
           />
         </View>
       </View>
