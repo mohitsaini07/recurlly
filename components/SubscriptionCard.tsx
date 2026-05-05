@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable, Image } from 'react-native';
 import Animated, { LinearTransition, FadeIn, FadeOut } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { formatCurrency } from '@/lib/utils';
 
-type SubscriptionCardProps = {
-  name: string;
-  price: string;
-  billing: string;
-  date: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  color?: string;
-};
-
-export function SubscriptionCard({ name, price, billing, date, icon, color = '#081126' }: SubscriptionCardProps) {
+export function SubscriptionCard({
+  name,
+  price,
+  billing,
+  renewalDate,
+  startDate,
+  icon,
+  currency,
+  plan,
+  paymentMethod,
+}: Subscription) {
   const [expanded, setExpanded] = useState(false);
+
+  const formatSubDate = (isoString?: string) => {
+    if (!isoString) return '';
+    const d = new Date(isoString);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  };
+
+  const formattedPrice = formatCurrency(price, currency);
 
   return (
     <Animated.View layout={LinearTransition} className={`sub-card mb-4 ${expanded ? 'sub-card-expanded' : ''}`}>
       <Pressable onPress={() => setExpanded(!expanded)} className="sub-head">
         <View className="sub-main">
           <View className="sub-icon items-center justify-center bg-black/5">
-            <Ionicons name={icon} size={32} color={color} />
+            <Image source={icon} style={{ width: 32, height: 32 }} resizeMode="contain" />
           </View>
           <View className="sub-copy">
             <Text className="sub-title" numberOfLines={1}>{name}</Text>
-            <Text className="sub-meta">{date}</Text>
+            <Text className="sub-meta">Next bill: {formatSubDate(renewalDate)}</Text>
           </View>
         </View>
         <View className="sub-price-box">
-          <Text className="sub-price">{price}</Text>
+          <Text className="sub-price">{formattedPrice}</Text>
           <Text className="sub-billing">{billing}</Text>
         </View>
       </Pressable>
@@ -37,12 +47,20 @@ export function SubscriptionCard({ name, price, billing, date, icon, color = '#0
         <Animated.View entering={FadeIn} exiting={FadeOut} className="sub-body">
           <View className="sub-details">
             <View className="sub-row">
+              <Text className="sub-label">Plan</Text>
+              <Text className="sub-value text-right">{plan}</Text>
+            </View>
+            <View className="sub-row">
+              <Text className="sub-label">Payment Method</Text>
+              <Text className="sub-value text-right">{paymentMethod}</Text>
+            </View>
+            <View className="sub-row">
               <Text className="sub-label">Started on</Text>
-              <Text className="sub-value text-right">Oct 12, 2022</Text>
+              <Text className="sub-value text-right">{formatSubDate(startDate)}</Text>
             </View>
             <View className="sub-row">
               <Text className="sub-label">Billing Cycle</Text>
-              <Text className="sub-value text-right">Monthly</Text>
+              <Text className="sub-value text-right">{billing}</Text>
             </View>
           </View>
           <TouchableOpacity className="sub-cancel" activeOpacity={0.8}>

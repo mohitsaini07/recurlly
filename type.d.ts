@@ -39,8 +39,8 @@ declare global {
     id: string;
     name: string;
     price: string;
-    date: string;
-    icon: keyof typeof Ionicons.glyphMap;
+    daysLeft: number;
+    icon: string;
     color?: string;
   }
 

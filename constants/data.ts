@@ -8,7 +8,7 @@ export const TABS: AppTab[] = [
 ];
 
 export const HOME_USER = {
-  name: "Mohit | Rohit",
+  name: "Mohit",
 };
 
 export const HOME_BALANCE = {
@@ -21,33 +21,33 @@ export const UPCOMING_SUBSCRIPTIONS: UpcomingSubscription[] = [
     id: "1",
     name: "Spotify",
     price: "$5.99",
-    date: "Feb 12",
-    icon: "logo-github" as const,
+    daysLeft: 6,
+    icon: 'spotify' as const,
     color: "#1DB954",
   },
   {
     id: "2",
-    name: "YouTube",
+    name: "GitHub",
     price: "$18.99",
-    date: "Feb 14",
-    icon: "logo-youtube" as const,
-    color: "#FF0000",
+    daysLeft: 3,
+    icon: 'github' as const,
+    color: "#000000",
   },
   {
     id: "3",
     name: "Figma",
     price: "$15.00",
-    date: "Feb 16",
-    icon: "logo-figma" as const,
+    daysLeft: 4,
+    icon: '' as const,
     color: "#F24E1E",
   },
   {
     id: "4",
-    name: "Apple Music",
+    name: "Open AI",
     price: "$9.99",
-    date: "Feb 19",
-    icon: "logo-apple" as const,
-    color: "#FF0000",
+    daysLeft: 8,
+    icon: 'open-a-i' as const,
+    color: "#000000",
   },
 ];
 

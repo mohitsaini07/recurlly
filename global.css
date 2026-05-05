@@ -78,7 +78,7 @@
     }
 
     .home-avatar {
-        @apply size-16 rounded-full;
+        @apply size-12 rounded-full;
     }
 
     .home-user-name {
