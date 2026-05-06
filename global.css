@@ -246,7 +246,7 @@
     }
 
     .auth-content {
-        @apply grow px-5 pb-10 pt-8;
+        @apply px-5 pb-10 pt-32;
     }
 
     .auth-brand-block {
@@ -270,7 +270,7 @@
     }
 
     .auth-wordmark-sub {
-        @apply -mt-1 text-xs font-sans-semibold uppercase tracking-[1px] text-muted-foreground;
+        @apply -mt-0.5 text-xs font-sans-semibold uppercase tracking-[1px] text-muted-foreground;
     }
 
     .auth-title {

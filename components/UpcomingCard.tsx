@@ -7,7 +7,7 @@ export function UpcomingCard({ name, price, daysLeft, icon, color = '#081126' }:
     <View className="upcoming-card">
       <View className="upcoming-row">
         <View className="upcoming-icon items-center justify-center rounded-xl bg-black/5">
-          <AntDesign name={icon as any} size={28} color={color} />
+          <AntDesign name={icon as any} size={42} color={color} />
         </View>
         <View>
           <Text className="upcoming-price">{price}</Text>
