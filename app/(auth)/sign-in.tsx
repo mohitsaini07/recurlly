@@ -12,10 +12,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter, type Href } from "expo-router";
 import { useSignIn } from "@clerk/expo";
+import { usePostHog } from "posthog-react-native";
 
 export default function SignIn() {
   const { signIn, errors, fetchStatus } = useSignIn();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +36,7 @@ export default function SignIn() {
 
       if (error) {
         console.error(JSON.stringify(error, null, 2));
+        posthog.capture("user_sign_in_failed", { error_message: String(error) });
         return;
       }
 
@@ -44,6 +47,8 @@ export default function SignIn() {
               console.log("Session task:", session.currentTask);
               return;
             }
+            posthog.identify(emailAddress, { $set: { email: emailAddress } });
+            posthog.capture("user_signed_in", { email: emailAddress });
             const url = decorateUrl("/");
             router.replace(url as Href);
           },
@@ -51,6 +56,7 @@ export default function SignIn() {
       } else {
         console.log("Sign-in not complete:", signIn.status);
         setLocalError("Sign-in could not be completed. Please try again.");
+        posthog.capture("user_sign_in_failed", { reason: "incomplete" });
       }
     } catch (err: any) {
       const message =
@@ -58,13 +64,13 @@ export default function SignIn() {
         err?.errors?.[0]?.message ||
         "Something went wrong";
       setLocalError(message);
+      posthog.capture("user_sign_in_failed", { error_message: message });
     }
   };
 
   // Get field-level errors from Clerk
   const emailError = errors?.fields?.identifier?.message;
   const passwordError = errors?.fields?.password?.message;
-  const displayError = localError || emailError || passwordError;
 
   return (
     <SafeAreaView
@@ -163,7 +169,7 @@ export default function SignIn() {
 
             {/* Footer link */}
             <View className="auth-link-row">
-              <Text className="auth-link-copy">Don't have an account?</Text>
+              <Text className="auth-link-copy">{"Don't have an account?"}</Text>
               <Link href="/(auth)/sign-up">
                 <Text className="auth-link">Sign Up</Text>
               </Link>

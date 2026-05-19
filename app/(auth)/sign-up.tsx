@@ -12,10 +12,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter, type Href } from "expo-router";
 import { useSignUp } from "@clerk/expo";
+import { usePostHog } from "posthog-react-native";
 
 export default function SignUp() {
   const { signUp, errors, fetchStatus } = useSignUp();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -37,11 +39,13 @@ export default function SignUp() {
 
       if (error) {
         console.error(JSON.stringify(error, null, 2));
+        posthog.capture("user_sign_up_failed", { error_message: String(error) });
         return;
       }
 
       // Send email verification code
       await signUp.verifications.sendEmailCode();
+      posthog.capture("user_signed_up", { email: emailAddress });
       setPendingVerification(true);
     } catch (err: any) {
       const message =
@@ -49,6 +53,7 @@ export default function SignUp() {
         err?.errors?.[0]?.message ||
         "Something went wrong";
       setLocalError(message);
+      posthog.capture("user_sign_up_failed", { error_message: message });
     }
   };
 
@@ -66,6 +71,11 @@ export default function SignUp() {
               console.log("Session task:", session.currentTask);
               return;
             }
+            posthog.identify(emailAddress, {
+              $set: { email: emailAddress },
+              $set_once: { first_sign_up_date: new Date().toISOString() },
+            });
+            posthog.capture("email_verification_completed", { email: emailAddress });
             const url = decorateUrl("/");
             router.replace(url as Href);
           },
@@ -73,6 +83,7 @@ export default function SignUp() {
       } else {
         console.log("Sign-up not complete:", signUp.status);
         setLocalError("Verification could not be completed.");
+        posthog.capture("user_sign_up_failed", { reason: "verification_incomplete" });
       }
     } catch (err: any) {
       const message =
@@ -80,6 +91,7 @@ export default function SignUp() {
         err?.errors?.[0]?.message ||
         "Invalid verification code";
       setLocalError(message);
+      posthog.capture("user_sign_up_failed", { error_message: message });
     }
   };
 

@@ -1,8 +1,9 @@
 import "@/global.css"
 import React from 'react';
-import { View, Text, FlatList, Image } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { usePostHog } from 'posthog-react-native';
 import { UPCOMING_SUBSCRIPTIONS, HOME_SUBSCRIPTIONS, HOME_BALANCE, HOME_USER } from "@/constants/data";
 import { UpcomingCard } from "@/components/UpcomingCard";
 import { SubscriptionCard } from '@/components/SubscriptionCard';
@@ -11,6 +12,8 @@ import images from "@/constants/images";
 import dayjs from "dayjs";
 
 function ListHeader() {
+  const posthog = usePostHog();
+
   return (
     <View className="mb-2">
       <View className="home-header">
@@ -21,11 +24,15 @@ function ListHeader() {
           />
           <Text className="home-user-name">Hi, {HOME_USER.name}!</Text>
         </View>
-        <View className="home-add-icon items-center justify-center rounded-full bg-black/5">
+        <TouchableOpacity
+          className="home-add-icon items-center justify-center rounded-full bg-black/5"
+          onPress={() => posthog.capture('home_add_subscription_tapped')}
+          activeOpacity={0.7}
+        >
           <Ionicons name="add" size={28} color="#081126" />
-        </View>
+        </TouchableOpacity>
       </View>
- 
+
        <View className="home-balance-card">
          <Text className="home-balance-label">Total Balance</Text>
          <View className="home-balance-row">
@@ -36,9 +43,13 @@ function ListHeader() {
 
       <View className="list-head mt-6">
         <Text className="list-title">Upcoming</Text>
-        <View className="list-action">
+        <TouchableOpacity
+          className="list-action"
+          onPress={() => posthog.capture('home_see_all_upcoming_tapped')}
+          activeOpacity={0.7}
+        >
           <Text className="list-action-text">See All</Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -52,9 +63,13 @@ function ListHeader() {
 
       <View className="list-head mt-8">
         <Text className="list-title">All Subscriptions</Text>
-        <View className="list-action">
+        <TouchableOpacity
+          className="list-action"
+          onPress={() => posthog.capture('home_subscriptions_filter_tapped')}
+          activeOpacity={0.7}
+        >
           <Text className="list-action-text">Filter</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

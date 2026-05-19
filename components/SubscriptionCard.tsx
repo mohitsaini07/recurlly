@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Pressable, Image } from 'react-native';
 import Animated, { LinearTransition, FadeIn, FadeOut } from 'react-native-reanimated';
 import { formatCurrency } from '@/lib/utils';
+import { usePostHog } from 'posthog-react-native';
 
 export function SubscriptionCard({
   name,
@@ -15,6 +16,15 @@ export function SubscriptionCard({
   paymentMethod,
 }: Subscription) {
   const [expanded, setExpanded] = useState(false);
+  const posthog = usePostHog();
+
+  const handleToggleExpand = () => {
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    if (nextExpanded) {
+      posthog.capture('subscription_expanded', { name, billing, price });
+    }
+  };
 
   const formatSubDate = (isoString?: string) => {
     if (!isoString) return '';
@@ -27,7 +37,7 @@ export function SubscriptionCard({
 
   return (
     <Animated.View layout={LinearTransition} className={`sub-card mb-4 ${expanded ? 'sub-card-expanded' : ''}`}>
-      <Pressable onPress={() => setExpanded(!expanded)} className="sub-head">
+      <Pressable onPress={handleToggleExpand} className="sub-head">
         <View className="sub-main">
           <View className="sub-icon items-center justify-center bg-black/5">
             <Image source={icon} style={{ width: 32, height: 32 }} resizeMode="contain" />
@@ -63,7 +73,11 @@ export function SubscriptionCard({
               <Text className="sub-value text-right">{billing}</Text>
             </View>
           </View>
-          <TouchableOpacity className="sub-cancel" activeOpacity={0.8}>
+          <TouchableOpacity
+            className="sub-cancel"
+            activeOpacity={0.8}
+            onPress={() => posthog.capture('subscription_cancel_tapped', { name, billing, price })}
+          >
             <Text className="sub-cancel-text">Cancel Subscription</Text>
           </TouchableOpacity>
         </Animated.View>
