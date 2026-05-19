@@ -1,5 +1,5 @@
 import "@/global.css"
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,8 +10,9 @@ import { SubscriptionCard } from '@/components/SubscriptionCard';
 import { formatCurrency } from "@/lib/utils";
 import images from "@/constants/images";
 import dayjs from "dayjs";
+import { CreateSubscriptionModal } from "@/components/CreateSubscriptionModal";
 
-function ListHeader() {
+function ListHeader({ onAddPress }: { onAddPress: () => void }) {
   const posthog = usePostHog();
 
   return (
@@ -26,7 +27,10 @@ function ListHeader() {
         </View>
         <TouchableOpacity
           className="home-add-icon items-center justify-center rounded-full bg-black/5"
-          onPress={() => posthog.capture('home_add_subscription_tapped')}
+          onPress={() => {
+            posthog.capture('home_add_subscription_tapped');
+            onAddPress();
+          }}
           activeOpacity={0.7}
         >
           <Ionicons name="add" size={28} color="#081126" />
@@ -76,18 +80,31 @@ function ListHeader() {
 }
 
 export default function Home() {
+  const [subscriptions, setSubscriptions] = useState(HOME_SUBSCRIPTIONS);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const handleCreateSubscription = (newSub: any) => {
+    setSubscriptions(prev => [newSub, ...prev]);
+    HOME_SUBSCRIPTIONS.unshift(newSub);
+  };
+
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: '#fff9e3' }}>
       <View className="flex-1 bg-background">
         <FlatList
-          data={HOME_SUBSCRIPTIONS}
+          data={subscriptions}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <SubscriptionCard {...item} />}
-          ListHeaderComponent={<ListHeader />}
+          ListHeaderComponent={<ListHeader onAddPress={() => setModalVisible(true)} />}
           contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         />
       </View>
+      <CreateSubscriptionModal 
+        visible={isModalVisible} 
+        onClose={() => setModalVisible(false)} 
+        onCreate={handleCreateSubscription} 
+      />
     </SafeAreaView>
   );
 }
