@@ -4,16 +4,39 @@ import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePostHog } from 'posthog-react-native';
-import { UPCOMING_SUBSCRIPTIONS, HOME_SUBSCRIPTIONS, HOME_BALANCE, HOME_USER } from "@/constants/data";
+import { HOME_USER } from "@/constants/data";
 import { UpcomingCard } from "@/components/UpcomingCard";
 import { SubscriptionCard } from '@/components/SubscriptionCard';
 import { formatCurrency } from "@/lib/utils";
 import images from "@/constants/images";
 import dayjs from "dayjs";
 import { CreateSubscriptionModal } from "@/components/CreateSubscriptionModal";
+import { useSubscriptions } from "@/context/SubscriptionContext";
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 function ListHeader({ onAddPress }: { onAddPress: () => void }) {
   const posthog = usePostHog();
+  const { subscriptions } = useSubscriptions();
+
+  // Dynamic calculations
+  const totalBalance = subscriptions
+    .filter(s => s.status === 'active')
+    .reduce((sum, s) => sum + s.price, 0);
+
+  // Calculate upcoming
+  const now = dayjs();
+  const upcoming = subscriptions
+    .filter(s => s.status === 'active')
+    .map(s => {
+      let renewal = dayjs(s.renewalDate);
+      while (renewal.isBefore(now)) {
+        renewal = renewal.add(1, s.frequency === 'Yearly' ? 'year' : 'month');
+      }
+      return { ...s, daysLeft: renewal.diff(now, 'day'), renewalDate: renewal.toISOString() };
+    })
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+
+  const nextRenewalDate = upcoming.length > 0 ? upcoming[0].renewalDate : new Date().toISOString();
 
   return (
     <View className="mb-2">
@@ -40,8 +63,8 @@ function ListHeader({ onAddPress }: { onAddPress: () => void }) {
        <View className="home-balance-card">
          <Text className="home-balance-label">Total Balance</Text>
          <View className="home-balance-row">
-           <Text className="home-balance-amount">{formatCurrency(HOME_BALANCE.amount)}</Text>
-           <Text className="home-balance-date">{dayjs(HOME_BALANCE.nextRenewalDate).format('MM/DD')}</Text>
+           <Text className="home-balance-amount">{formatCurrency(totalBalance)}</Text>
+           <Text className="home-balance-date">{dayjs(nextRenewalDate).format('MM/DD')}</Text>
          </View>
        </View>
 
@@ -56,14 +79,18 @@ function ListHeader({ onAddPress }: { onAddPress: () => void }) {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={UPCOMING_SUBSCRIPTIONS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <UpcomingCard {...item} />}
-        contentContainerStyle={{ paddingRight: 20 }}
-      />
+      {upcoming.length > 0 ? (
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={upcoming}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => <UpcomingCard {...item} index={index} />}
+          contentContainerStyle={{ paddingRight: 20 }}
+        />
+      ) : (
+        <Text className="text-sm font-sans-medium text-primary/60 mb-2">No upcoming subscriptions.</Text>
+      )}
 
       <View className="list-head mt-8">
         <Text className="list-title">All Subscriptions</Text>
@@ -80,30 +107,25 @@ function ListHeader({ onAddPress }: { onAddPress: () => void }) {
 }
 
 export default function Home() {
-  const [subscriptions, setSubscriptions] = useState(HOME_SUBSCRIPTIONS);
+  const { subscriptions, addSubscription } = useSubscriptions();
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const handleCreateSubscription = (newSub: any) => {
-    setSubscriptions(prev => [newSub, ...prev]);
-    HOME_SUBSCRIPTIONS.unshift(newSub);
-  };
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: '#fff9e3' }}>
-      <View className="flex-1 bg-background">
+      <Animated.View entering={FadeIn.duration(400)} className="flex-1 bg-background">
         <FlatList
           data={subscriptions}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <SubscriptionCard {...item} />}
+          renderItem={({ item, index }) => <SubscriptionCard {...item} index={index} />}
           ListHeaderComponent={<ListHeader onAddPress={() => setModalVisible(true)} />}
           contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         />
-      </View>
+      </Animated.View>
       <CreateSubscriptionModal 
         visible={isModalVisible} 
         onClose={() => setModalVisible(false)} 
-        onCreate={handleCreateSubscription} 
+        onCreate={addSubscription} 
       />
     </SafeAreaView>
   );

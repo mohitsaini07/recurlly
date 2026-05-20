@@ -3,19 +3,21 @@ import { View, Text, TextInput, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import { SubscriptionCard } from '@/components/SubscriptionCard'
-import { HOME_SUBSCRIPTIONS } from '@/constants/data'
+import { useSubscriptions } from '@/context/SubscriptionContext'
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 const Subscriptions = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const { subscriptions } = useSubscriptions();
 
-  const filteredSubscriptions = HOME_SUBSCRIPTIONS.filter((sub) =>
+  const filteredSubscriptions = subscriptions.filter((sub) =>
     sub.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     sub.category?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: '#fff9e3' }}>
-      <View className="flex-1 bg-background">
+      <Animated.View entering={FadeIn.duration(400)} className="flex-1 bg-background">
         <View className="px-5 pt-6 pb-2">
           <Text className="text-3xl font-sans-bold text-primary mb-6">Subscriptions</Text>
           
@@ -38,7 +40,7 @@ const Subscriptions = () => {
         <FlatList
           data={filteredSubscriptions}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <SubscriptionCard {...item} />}
+          renderItem={({ item, index }) => <SubscriptionCard {...item} index={index} />}
           contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
@@ -53,7 +55,7 @@ const Subscriptions = () => {
             </View>
           }
         />
-      </View>
+      </Animated.View>
     </SafeAreaView>
   )
 }

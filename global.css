@@ -314,7 +314,7 @@
     }
 
     .auth-button {
-        @apply mt-1 items-center rounded-2xl bg-accent py-4;
+        @apply mt-2 items-center rounded-2xl bg-accent py-4;
     }
 
     .auth-button-disabled {

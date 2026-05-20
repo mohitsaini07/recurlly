@@ -15,6 +15,8 @@ if (!publishableKey) {
   );
 }
 
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
+
 export default function RootLayout() {
   const pathname = usePathname();
   const params = useGlobalSearchParams();
@@ -58,7 +60,9 @@ export default function RootLayout() {
       }}
     >
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <SubscriptionProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </SubscriptionProvider>
       </ClerkProvider>
     </PostHogProvider>
   );
