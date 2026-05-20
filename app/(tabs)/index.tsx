@@ -16,7 +16,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 function ListHeader({ onAddPress }: { onAddPress: () => void }) {
   const posthog = usePostHog();
-  const { subscriptions } = useSubscriptions();
+  const { subscriptions, currency } = useSubscriptions();
 
   // Dynamic calculations
   const totalBalance = subscriptions
@@ -63,7 +63,7 @@ function ListHeader({ onAddPress }: { onAddPress: () => void }) {
        <View className="home-balance-card">
          <Text className="home-balance-label">Total Balance</Text>
          <View className="home-balance-row">
-           <Text className="home-balance-amount">{formatCurrency(totalBalance)}</Text>
+           <Text className="home-balance-amount">{formatCurrency(totalBalance, currency)}</Text>
            <Text className="home-balance-date">{dayjs(nextRenewalDate).format('MM/DD')}</Text>
          </View>
        </View>

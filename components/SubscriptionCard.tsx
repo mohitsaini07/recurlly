@@ -5,6 +5,7 @@ import { formatCurrency } from '@/lib/utils';
 import { usePostHog } from 'posthog-react-native';
 import dayjs from 'dayjs';
 import { useSubscriptions } from '@/context/SubscriptionContext';
+import { icons } from '@/constants/icons';
 
 export function SubscriptionCard({
   id,
@@ -22,8 +23,9 @@ export function SubscriptionCard({
   index = 0,
 }: any) {
   const [expanded, setExpanded] = useState(false);
+  const [iconError, setIconError] = useState(false);
   const posthog = usePostHog();
-  const { removeSubscription } = useSubscriptions();
+  const { removeSubscription, currency: globalCurrency } = useSubscriptions();
 
   const handleToggleExpand = () => {
     const nextExpanded = !expanded;
@@ -40,7 +42,7 @@ export function SubscriptionCard({
     }
   };
 
-  const formattedPrice = formatCurrency(price, currency);
+  const formattedPrice = formatCurrency(price, globalCurrency || currency);
 
   return (
     <Animated.View 
@@ -54,8 +56,13 @@ export function SubscriptionCard({
         onPress={handleToggleExpand}
       >
         <View className="flex-row items-center">
-          <View className="w-14 h-14 rounded-2xl bg-white/30 justify-center items-center">
-            <Image source={icon} className="w-8 h-8" resizeMode="contain" />
+          <View className="w-14 h-14 rounded-2xl bg-white/30 justify-center items-center overflow-hidden">
+            <Image 
+              source={iconError ? icons.wallet : icon} 
+              className="w-8 h-8" 
+              resizeMode="contain" 
+              onError={() => setIconError(true)}
+            />
           </View>
           <View className="ml-4">
             <Text className="text-xl font-sans-bold text-primary">{name}</Text>

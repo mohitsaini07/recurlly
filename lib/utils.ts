@@ -5,12 +5,12 @@
  * @param currency - The currency code (default: 'INR').
  * @returns A formatted currency string with exactly two decimal places.
  */
-export const formatCurrency = (value: number, currency: string = 'INR') => {
+export const formatCurrency = (value: number, currency: string = 'USD') => {
   try {
-    return new Intl.NumberFormat('en-IN', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(value);
   } catch (error) {

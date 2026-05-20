@@ -14,6 +14,8 @@ import clsx from "clsx";
 import dayjs from "dayjs";
 import { icons } from "@/constants/icons";
 import { posthog } from "@/src/config/posthog";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSubscriptions } from "@/context/SubscriptionContext";
 
 interface CreateSubscriptionModalProps {
   visible: boolean;
@@ -55,7 +57,9 @@ const getIconFromName = (subName: string) => {
   if (normalized.includes("notion")) return icons.notion;
   if (normalized.includes("openai") || normalized.includes("chatgpt")) return icons.openai;
   if (normalized.includes("spotify")) return icons.spotify;
-  return icons.wallet;
+  const cleanName = normalized.replace(/[^a-z0-9]/g, '');
+  if (!cleanName) return icons.wallet;
+  return { uri: `https://icon.horse/icon/${cleanName}.com` };
 };
 
 export const CreateSubscriptionModal = ({
@@ -63,6 +67,8 @@ export const CreateSubscriptionModal = ({
   onClose,
   onCreate,
 }: CreateSubscriptionModalProps) => {
+  const insets = useSafeAreaInsets();
+  const { currency } = useSubscriptions();
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [frequency, setFrequency] = useState<"Monthly" | "Yearly">("Monthly");
@@ -116,7 +122,7 @@ export const CreateSubscriptionModal = ({
       icon: getIconFromName(name.trim()),
       billing: frequency,
       color: randomColor,
-      currency: "USD",
+      currency: currency,
       paymentMethod: "New Card",
     };
 
@@ -135,7 +141,7 @@ export const CreateSubscriptionModal = ({
   const isValid = name.trim().length > 0 && parseFloat(price) > 0;
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent={true}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
@@ -147,7 +153,10 @@ export const CreateSubscriptionModal = ({
             onPress={handleClose}
           />
 
-          <View className="modal-container">
+          <View 
+            className="modal-container" 
+            style={{ paddingBottom: Math.max(insets.bottom, 20) }}
+          >
             <View className="modal-header">
               <Text className="modal-title">New Subscription</Text>
               <TouchableOpacity className="modal-close" onPress={handleClose}>

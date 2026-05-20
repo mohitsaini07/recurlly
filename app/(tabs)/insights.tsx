@@ -9,11 +9,12 @@ import { usePostHog } from 'posthog-react-native';
 import { SubscriptionCard } from '@/components/SubscriptionCard';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import { formatCurrency } from '@/lib/utils';
 
 const Insights = () => {
   const router = useRouter();
   const posthog = usePostHog();
-  const { subscriptions } = useSubscriptions();
+  const { subscriptions, currency } = useSubscriptions();
 
   // Dynamic expenses calculation
   const totalExpenses = subscriptions
@@ -93,20 +94,20 @@ const Insights = () => {
               {/* Bars */}
               <View className="flex-1 flex-row justify-between items-end pt-8 pb-8 px-2">
                 {chartData.map((d, i) => (
-                  <View key={i} className="items-center relative h-full justify-end">
+                  <View key={i} className="items-center relative h-full justify-end w-10">
                     {d.highlighted && (
                       <View 
-                        className="absolute bg-white px-2 py-1 rounded-lg items-center justify-center shadow-sm z-20"
+                        className="absolute bg-accent px-2.5 py-1 rounded-lg items-center justify-center shadow-sm z-20"
                         style={{ bottom: `${(d.value / maxVal) * 100}%`, marginBottom: 8 }}
                       >
-                        <Text className="text-accent text-xs font-sans-bold">${d.value}</Text>
+                        <Text className="text-white text-xs font-sans-bold">${d.value}</Text>
                       </View>
                     )}
                     <View 
                       style={{ height: `${(d.value / maxVal) * 100}%` }}
                       className={clsx("w-3.5 rounded-full z-10", d.highlighted ? "bg-accent" : "bg-primary")}
                     />
-                    <Text className="absolute -bottom-6 text-xs font-sans-semibold text-primary/50">{d.day}</Text>
+                    <Text className="absolute -bottom-6 left-0 right-0 text-center text-xs font-sans-semibold text-primary/50">{d.day}</Text>
                   </View>
                 ))}
               </View>
@@ -118,7 +119,7 @@ const Insights = () => {
         <View className="border border-black/10 rounded-3xl p-5 mb-8 bg-transparent">
           <View className="flex-row justify-between items-center mb-1">
             <Text className="text-xl font-sans-bold text-primary">Expenses</Text>
-            <Text className="text-xl font-sans-bold text-primary">-${totalExpenses.toFixed(2)}</Text>
+            <Text className="text-xl font-sans-bold text-primary">-{formatCurrency(totalExpenses, currency)}</Text>
           </View>
           <View className="flex-row justify-between items-center mt-1">
             <Text className="text-base font-sans-medium text-primary/60">{dayjs().format('MMMM YYYY')}</Text>
