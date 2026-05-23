@@ -40,6 +40,9 @@ export default {
     extra: {
       posthogProjectToken: process.env.POSTHOG_PROJECT_TOKEN,
       posthogHost: process.env.POSTHOG_HOST,
+      eas: {
+        projectId: "ef98848f-2a5b-461c-a9a5-37d43c78ed71",
+      },
     },
   },
 };

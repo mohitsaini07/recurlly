@@ -1,8 +1,7 @@
 /**
- * Formats a number as currency using standard Indian money format (defaults to INR).
- * 
+ * Formats a number as currency.
  * @param value - The numeric amount to format.
- * @param currency - The currency code (default: 'INR').
+ * @param currency - The currency code (default: 'USD').
  * @returns A formatted currency string with exactly two decimal places.
  */
 export const formatCurrency = (value: number, currency: string = 'USD') => {

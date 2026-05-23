@@ -1,11 +1,10 @@
 import { TABS } from "@/constants/data";
-import { Image } from "react-native";
-import { Tabs, Redirect } from "expo-router";
-import { View } from "react-native";
-import { clsx } from "clsx";
-import { colors, components, spacing, theme } from "@/constants/theme";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors, components } from "@/constants/theme";
 import { useAuth } from "@clerk/expo";
+import { clsx } from "clsx";
+import { Redirect, Tabs } from "expo-router";
+import { Image, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabBar = components.tabBar;
 
@@ -49,12 +48,12 @@ const TabsLayout = () => {
           marginHorizontal: tabBar.horizontalInset,
         },
         tabBarItemStyle: {
-          paddingVertical: tabBar.height / 2 - tabBar.iconFrame /1.6
+          paddingVertical: tabBar.height / 2 - tabBar.iconFrame / 1.6
         },
         tabBarIconStyle: {
-         width: tabBar.iconFrame,
-         height: tabBar.iconFrame,
-         alignItems: 'center',
+          width: tabBar.iconFrame,
+          height: tabBar.iconFrame,
+          alignItems: 'center',
         }
       }}
     >
