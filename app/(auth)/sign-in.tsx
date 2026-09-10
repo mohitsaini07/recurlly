@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -68,7 +68,6 @@ export default function SignIn() {
     }
   };
 
-  // Get field-level errors from Clerk
   const emailError = errors?.fields?.identifier?.message;
   const passwordError = errors?.fields?.password?.message;
 
