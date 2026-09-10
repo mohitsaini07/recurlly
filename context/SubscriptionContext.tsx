@@ -9,6 +9,8 @@ type SubscriptionContextType = {
   updateSubscription: (id: string, updates: any) => void;
   currency: string;
   setCurrency: (currency: string) => void;
+  resetSubscriptions: () => void;
+  clearSubscriptions: () => void;
 };
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
@@ -67,6 +69,14 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
     }
   };
 
+  const resetSubscriptions = () => {
+    setSubscriptions(HOME_SUBSCRIPTIONS);
+  };
+
+  const clearSubscriptions = () => {
+    setSubscriptions([]);
+  };
+
   return (
     <SubscriptionContext.Provider value={{ 
       subscriptions, 
@@ -74,7 +84,9 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
       removeSubscription, 
       updateSubscription,
       currency,
-      setCurrency
+      setCurrency,
+      resetSubscriptions,
+      clearSubscriptions,
     }}>
       {children}
     </SubscriptionContext.Provider>

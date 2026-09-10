@@ -20,6 +20,7 @@ export function SubscriptionCard({
   paymentMethod,
   status,
   color,
+  subtitle,
   index = 0,
 }: any) {
   const [expanded, setExpanded] = useState(false);
@@ -67,7 +68,7 @@ export function SubscriptionCard({
           <View className="ml-4">
             <Text className="text-xl font-sans-bold text-primary">{name}</Text>
             <Text className="text-sm font-sans-medium text-primary/60 mt-0.5">
-              {dayjs(startDate).format("MMMM D, HH:mm")}
+              {subtitle || dayjs(startDate).format("MMMM D, HH:mm")}
             </Text>
           </View>
         </View>
